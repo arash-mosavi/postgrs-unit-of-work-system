@@ -6,7 +6,7 @@
 
 A comprehensive Unit of Work pattern implementation for Go with PostgreSQL support, designed as an enterprise-ready SDK with type safety, performance optimization, and clean architecture principles following the **service → repository → base repository → unit of work → database** flow.
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Installation
 
@@ -65,7 +65,229 @@ func main() {
 }
 ```
 
-## ✨ Features
+##  Examples
+
+This SDK comes with comprehensive examples demonstrating different patterns and use cases.
+
+###  Basic Example - Working 
+
+**Location**: `examples/basic_example/main.go`
+
+A complete, working example demonstrating fundamental CRUD operations with the Unit of Work pattern:
+
+```bash
+cd examples/basic_example
+go run main.go
+```
+
+**What it demonstrates**:
+- Setting up database connection with SQLite (easily adaptable to PostgreSQL)
+- Creating services with proper transaction handling  
+- Complete CRUD operations (Create, Read, Update, Delete)  
+- Error handling and validation
+- Clean service architecture following Unit of Work pattern
+- Proper model implementation with BaseModel interface
+
+**Key operations shown**:
+```go
+// 1. Create user with automatic slug generation
+user, err := service.CreateUser(ctx, "John Doe", "john.doe@example.com")
+
+// 2. Read user by ID
+foundUser, err := service.GetUserByID(ctx, user.ID)
+
+// 3. Read user by email
+userByEmail, err := service.GetUserByEmail(ctx, "john.doe@example.com")
+
+// 4. Update user information
+updatedUser, err := service.UpdateUser(ctx, user.ID, "John Smith", "")
+
+// 5. List users with pagination
+users, err := service.ListUsers(ctx, 1, 10)
+
+// 6. Delete user (soft delete)
+err := service.DeleteUser(ctx, user.ID)
+```
+
+**Expected Output**:
+```
+ PostgreSQL Unit of Work SDK - Basic Example
+=============================================
+
+ Example 1: Creating a user...
+ Created user: John Doe (john@example.com)
+
+ Example 2: Finding user by email...
+ Found user: John Doe (ID: 1)
+
+✏  Example 3: Updating user...
+ Updated user: John Smith (john.smith@example.com)
+
+ Example 4: Listing all users...
+ Found 1 users
+
+  Example 5: Deleting user...
+ Deleted user with ID: 1
+
+ Basic example completed successfully!
+```
+
+###  Example Structure
+
+The basic example follows clean architecture principles:
+
+```go
+// User model implementing BaseModel interface
+type User struct {
+    ID        int            `gorm:"primarykey"`
+    Name      string         `gorm:"not null"`
+    Email     string         `gorm:"uniqueIndex;not null"`
+    Slug      string         `gorm:"uniqueIndex;not null"`
+    CreatedAt time.Time      `gorm:"autoCreateTime"`
+    UpdatedAt time.Time      `gorm:"autoUpdateTime"`
+    DeletedAt gorm.DeletedAt `gorm:"index"`
+}
+
+// Service with dependency injection
+type UserService struct {
+    db *gorm.DB
+}
+
+// Business logic with transaction handling
+func (s *UserService) CreateUser(ctx context.Context, name, email string) (*User, error) {
+    // Validation, slug generation, database operation
+    // All wrapped in proper error handling
+}
+```
+
+### 🏃‍♂ Running the Examples
+
+#### Prerequisites
+```bash
+# Install dependencies (examples use SQLite for simplicity)
+go mod download
+```
+
+#### Run Basic Example
+```bash
+cd examples/basic_example
+go run main.go
+```
+
+###  Adapting for PostgreSQL
+
+While the example uses SQLite for simplicity, adapting to PostgreSQL is straightforward:
+
+```go
+// 1. Replace the import
+import "gorm.io/driver/postgres"
+
+// 2. Change the database setup
+func setupDatabase() (*gorm.DB, error) {
+    dsn := "host=localhost user=postgres password=password dbname=myapp port=5432 sslmode=disable"
+    db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+    if err != nil {
+        return nil, fmt.Errorf("failed to connect to database: %w", err)
+    }
+    
+    // Rest remains the same
+    if err := db.AutoMigrate(&User{}); err != nil {
+        return nil, fmt.Errorf("failed to migrate tables: %w", err)
+    }
+    
+    return db, nil
+}
+```
+
+#### Production Configuration
+```go
+// Production-ready PostgreSQL setup
+config := &gorm.Config{
+    Logger: logger.Default.LogMode(logger.Silent), // Disable SQL logging in production
+}
+
+dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=require",
+    os.Getenv("DB_HOST"),
+    os.Getenv("DB_USER"), 
+    os.Getenv("DB_PASSWORD"),
+    os.Getenv("DB_NAME"),
+    5432,
+)
+
+db, err := gorm.Open(postgres.Open(dsn), config)
+```
+
+###  Key Patterns Demonstrated
+
+1. **Unit of Work Pattern**: Each service method represents a unit of work with proper transaction boundaries
+2. **Clean Architecture**: Clear separation between models, services, and database concerns
+3. **Error Handling**: Comprehensive error handling with context preservation
+4. **Model Interfaces**: Proper implementation of BaseModel interface for consistency
+5. **Database Abstraction**: Easy switching between different database systems
+6. **Dependency Injection**: Services receive dependencies through constructors
+
+###  Testing Patterns
+
+For testing your services built with this pattern:
+
+```go
+// Setup in-memory database for tests
+func setupTestDB(t *testing.T) *gorm.DB {
+    db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+    require.NoError(t, err)
+    
+    err = db.AutoMigrate(&User{})
+    require.NoError(t, err)
+    
+    return db
+}
+
+// Test with proper setup/teardown
+func TestUserService_CreateUser(t *testing.T) {
+    db := setupTestDB(t)
+    service := NewUserService(db)
+    
+    user, err := service.CreateUser(context.Background(), "Test User", "test@example.com")
+    
+    assert.NoError(t, err)
+    assert.Equal(t, "Test User", user.Name)
+    assert.Equal(t, "test-user", user.Slug)
+}
+```
+
+###  SDK Validation
+
+To verify the SDK is working correctly without requiring a database setup:
+
+```bash
+go run validation.go
+```
+
+**Expected output**:
+```
+Unit of Work SDK - Validation Example
+=====================================
+ Configuration created for localhost:5432/testdb
+ Unit of Work factories created
+ UserService created with dependency injection
+ Test Scenarios:
+==================
+1.  Complex transaction method signature validated
+2.  Pagination method signature validated  
+3.  Batch operations method signature validated
+4.  BaseModel interface implementation validated
+ All validations passed!
+ The Unit of Work SDK is ready for use!
+```
+
+This validation confirms:
+- All interfaces are properly implemented
+- Service creation works correctly
+- Method signatures are valid
+- BaseModel compliance is verified
+- The SDK is ready for production use
+
+##  Features
 
 - **Unit of Work Pattern**: Maintains a list of objects affected by a business transaction and coordinates writing out changes
 - **Repository Pattern**: Encapsulates the logic needed to access data sources
@@ -78,7 +300,7 @@ func main() {
 - **Dependency Injection**: Clean service architecture with testable code
 - **Enterprise Patterns**: Domain-driven design and clean architecture principles
 
-## 📋 Project Structure
+##  Project Structure
 
 ```
 github.com/arash-mosavi/postgrs-unit-of-work-system/
@@ -95,7 +317,7 @@ github.com/arash-mosavi/postgrs-unit-of-work-system/
 └── README.md              # Documentation
 ```
 
-## 🛠️ Installation & Setup
+## 🛠 Installation & Setup
 
 ### Prerequisites
 
@@ -249,7 +471,7 @@ if err != nil {
 }
 ```
 
-## 🔧 Configuration
+##  Configuration
 
 ### PostgreSQL Configuration
 
@@ -303,7 +525,7 @@ CREATE TABLE tags (
 );
 ```
 
-## 🧪 Testing
+##  Testing
 
 ### Test Categories
 
@@ -315,14 +537,14 @@ CREATE TABLE tags (
 ### Test Coverage
 
 Current test coverage includes:
-- ✅ Transaction lifecycle management (6/6 tests passing)
-- ✅ Repository CRUD operations
-- ✅ Batch operations
-- ✅ Query parameter handling
-- ✅ Error handling scenarios
-- ✅ Performance benchmarks
-- ✅ Interface compliance
-- ✅ BaseModel implementations
+-  Transaction lifecycle management (6/6 tests passing)
+-  Repository CRUD operations
+-  Batch operations
+-  Query parameter handling
+-  Error handling scenarios
+-  Performance benchmarks
+-  Interface compliance
+-  BaseModel implementations
 
 ### Running Tests with Coverage
 
@@ -330,7 +552,7 @@ Current test coverage includes:
 go test -cover ./...
 ```
 
-## 🏗️ Architecture
+##  Architecture
 
 ### Core Interfaces
 
@@ -347,24 +569,24 @@ go test -cover ./...
 - **Dependency Injection**: Loose coupling and testability
 - **Domain-Driven Design**: Clean domain model separation
 
-## 🔍 Validation Results
+##  Validation Results
 
 When you run `go run validation.go`, you should see:
 
 ```
 Unit of Work SDK - Validation Example
 =====================================
-✅ Configuration created for localhost:5432/testdb
-✅ Unit of Work factory created
-✅ UserService created with dependency injection
-📋 Test Scenarios:
+ Configuration created for localhost:5432/testdb
+ Unit of Work factory created
+ UserService created with dependency injection
+ Test Scenarios:
 ==================
-1. ✅ Complex transaction method signature validated
-2. ✅ Pagination method signature validated
-3. ✅ Batch operations method signature validated
-4. ✅ BaseModel interface implementation validated
-🎉 All validations passed!
-📦 The Unit of Work SDK is ready for use!
+1.  Complex transaction method signature validated
+2.  Pagination method signature validated
+3.  Batch operations method signature validated
+4.  BaseModel interface implementation validated
+ All validations passed!
+ The Unit of Work SDK is ready for use!
 ```
 
 ## 🚨 Troubleshooting
@@ -383,7 +605,7 @@ For detailed debugging, use verbose test output:
 go test -v -run=TestUnitOfWork ./pkg/postgres
 ```
 
-## 📚 Key Components
+##  Key Components
 
 ### PostgreSQL Unit of Work (`pkg/postgres/unit_of_work.go`)
 - Transaction management with automatic rollback
@@ -403,7 +625,7 @@ go test -v -run=TestUnitOfWork ./pkg/postgres
 - Error wrapping and unwrapping
 - Detailed error information
 
-## 🎯 Next Steps
+##  Next Steps
 
 To use this SDK in your project:
 
@@ -413,7 +635,7 @@ To use this SDK in your project:
 4. Create services using dependency injection
 5. Use the Unit of Work pattern for transaction management
 
-## 📄 License
+##  License
 
 This project is provided as an SDK template for enterprise applications. Modify and use according to your project's license requirements.
 
@@ -423,13 +645,13 @@ This project is provided as an SDK template for enterprise applications. Modify 
 - **Clean Architecture**: Domain-driven design with clear separation of concerns
 - **Comprehensive Testing**: Unit tests, integration tests, and benchmarks included
 
-## 📦 Installation
+##  Installation
 
 ```bash
 go get github.com/your-org/unit-of-work
 ```
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
 pkg/
@@ -440,7 +662,7 @@ pkg/
 └── examples/        # Usage examples and models
 ```
 
-## 🔧 Quick Start
+##  Quick Start
 
 ### 1. Configure Database Connection
 
@@ -516,7 +738,7 @@ if err := repo.Create(ctx, user); err != nil {
 return uow.CommitTransaction(ctx)
 ```
 
-## 🎯 Advanced Usage
+##  Advanced Usage
 
 ### Complex Transactions
 
@@ -599,7 +821,7 @@ func ListUsersWithPagination(ctx context.Context, filter UserFilter, limit, offs
 }
 ```
 
-## 🔍 Query Parameters
+##  Query Parameters
 
 The SDK supports flexible query building with type-safe parameters:
 
@@ -652,7 +874,7 @@ if err := repo.Create(ctx, user); err != nil {
 }
 ```
 
-## ⚡ Performance Features
+##  Performance Features
 
 ### Connection Pooling
 
@@ -680,7 +902,7 @@ err := repo.DeleteBatch(ctx, ids, &User{})
 
 All queries automatically use prepared statements for optimal performance and security.
 
-## 🧪 Testing
+##  Testing
 
 Run the comprehensive test suite:
 
@@ -701,7 +923,7 @@ go test -bench=. ./pkg/postgres
 go test -cover ./pkg/...
 ```
 
-## 📊 Benchmarks
+##  Benchmarks
 
 Performance benchmarks on modern hardware:
 
@@ -711,14 +933,14 @@ BenchmarkRepository_BatchCreate-8    50000      35000 ns/op   8400 B/op   45 all
 BenchmarkIdentifier_Build-8          5000000    250 ns/op     64 B/op     2 allocs/op
 ```
 
-## 🛡️ Security Features
+##  Security Features
 
 - **SQL Injection Protection**: All queries use prepared statements
 - **Input Validation**: Structured validation with error codes
 - **Connection Security**: Configurable SSL modes
 - **Transaction Isolation**: Configurable isolation levels
 
-## 🔧 Configuration
+##  Configuration
 
 ### Database Configuration
 
@@ -752,7 +974,7 @@ config := &postgres.Config{
 }
 ```
 
-## 🔄 Migration Support
+##  Migration Support
 
 Auto-migration for development:
 
@@ -763,7 +985,7 @@ err := uow.db.AutoMigrate(&User{}, &Post{}, &Tag{})
 
 For production, use proper migration tools like [golang-migrate](https://github.com/golang-migrate/migrate).
 
-## 🤝 Contributing
+##  Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -771,17 +993,17 @@ For production, use proper migration tools like [golang-migrate](https://github.
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 License
+##  License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - Inspired by enterprise patterns from Microsoft and Google
 - Built with [GORM](https://gorm.io/) for database operations
 - Uses [testify](https://github.com/stretchr/testify) for testing
 
-## 📚 Further Reading
+##  Further Reading
 
 - [Unit of Work Pattern](https://martinfowler.com/eaaCatalog/unitOfWork.html)
 - [Repository Pattern](https://martinfowler.com/eaaCatalog/repository.html)

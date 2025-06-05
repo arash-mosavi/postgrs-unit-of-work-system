@@ -1,8 +1,8 @@
-# 🚀 Usage Guide - PostgreSQL Unit of Work System
+#  Usage Guide - PostgreSQL Unit of Work System
 
 This guide shows you how to run examples and use the PostgreSQL Unit of Work System SDK in your own projects.
 
-## 📋 Table of Contents
+##  Table of Contents
 
 1. [Quick Start](#quick-start)
 2. [Running Examples](#running-examples)
@@ -10,7 +10,7 @@ This guide shows you how to run examples and use the PostgreSQL Unit of Work Sys
 4. [Complete Examples](#complete-examples)
 5. [Testing](#testing)
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 
@@ -48,7 +48,7 @@ go get github.com/arash-mosavi/postgrs-unit-of-work-system
 # Create your main.go (see examples below)
 ```
 
-## 🏃‍♂️ Running Examples
+## 🏃‍♂ Running Examples
 
 ### 1. Run Validation Script (No Database Required)
 
@@ -60,16 +60,16 @@ go run validation.go
 ```
 Unit of Work SDK - Validation Example
 =====================================
-✅ Configuration created for localhost:5432/testdb
-✅ Unit of Work factories created
-✅ UserService created with dependency injection
-📋 Test Scenarios:
+ Configuration created for localhost:5432/testdb
+ Unit of Work factories created
+ UserService created with dependency injection
+ Test Scenarios:
 ==================
-1. ✅ Complex transaction method signature validated
-2. ✅ Pagination method signature validated
-3. ✅ Batch operations method signature validated
-4. ✅ BaseModel interface implementation validated
-🎉 All validations passed!
+1.  Complex transaction method signature validated
+2.  Pagination method signature validated
+3.  Batch operations method signature validated
+4.  BaseModel interface implementation validated
+ All validations passed!
 ```
 
 ### 2. Run Full Example (Requires PostgreSQL)
@@ -187,7 +187,7 @@ func main() {
         log.Fatal("Failed to create user with posts:", err)
     }
 
-    fmt.Printf("✅ Successfully created user '%s' with %d posts\n", 
+    fmt.Printf(" Successfully created user '%s' with %d posts\n", 
         user.Name, len(posts))
 
     // List users with pagination
@@ -196,7 +196,7 @@ func main() {
         log.Fatal("Failed to list users:", err)
     }
 
-    fmt.Printf("📋 Found %d users (total: %d)\n", len(users), total)
+    fmt.Printf(" Found %d users (total: %d)\n", len(users), total)
 
     // Search for user by email
     foundUser, err := userService.FindUserByEmail(ctx, "john@example.com")
@@ -204,7 +204,7 @@ func main() {
         log.Fatal("Failed to find user:", err)
     }
 
-    fmt.Printf("🔍 Found user: %s (%s)\n", foundUser.Name, foundUser.Email)
+    fmt.Printf(" Found user: %s (%s)\n", foundUser.Name, foundUser.Email)
 }
 ```
 
@@ -415,7 +415,7 @@ func main() {
         log.Fatal("Failed to create product:", err)
     }
 
-    fmt.Printf("✅ Created product: %s\n", product.Name)
+    fmt.Printf(" Created product: %s\n", product.Name)
 
     // Get products by category
     products, err := productService.GetProductsByCategory(ctx, product.CategoryID)
@@ -423,7 +423,7 @@ func main() {
         log.Fatal("Failed to get products:", err)
     }
 
-    fmt.Printf("📦 Found %d products in category\n", len(products))
+    fmt.Printf(" Found %d products in category\n", len(products))
 }
 ```
 
@@ -544,7 +544,7 @@ func main() {
 }
 ```
 
-## 🧪 Testing
+##  Testing
 
 ### Run Built-in Tests
 
@@ -602,7 +602,7 @@ func TestProductService(t *testing.T) {
 }
 ```
 
-## 🔧 Configuration Options
+##  Configuration Options
 
 ### Environment Variables
 
@@ -635,7 +635,7 @@ config.MaxOpenConns = 100
 config.ConnMaxLifetime = time.Hour
 ```
 
-## 📚 Next Steps
+##  Next Steps
 
 1. **Explore the Examples**: Check out `examples/usage.go` for more patterns
 2. **Read the Documentation**: See `README.md` for detailed API docs
@@ -663,4 +663,4 @@ if err != nil {
 }
 ```
 
-Happy coding! 🎉
+Happy coding! 
