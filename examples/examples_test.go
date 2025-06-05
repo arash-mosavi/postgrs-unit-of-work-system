@@ -3,8 +3,8 @@ package examples
 import (
 	"testing"
 
-	"unit-of-work/pkg/domain"
-	"unit-of-work/pkg/persistence"
+	"github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/domain"
+	"github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/persistence"
 
 	"github.com/stretchr/testify/assert"
 )

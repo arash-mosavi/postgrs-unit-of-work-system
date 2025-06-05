@@ -1,8 +1,71 @@
-# Unit of Work SDK for Go
+# PostgreSQL Unit of Work System
 
-A comprehensive Unit of Work pattern implementation for Go with PostgreSQL support, designed as an enterprise-ready SDK with type safety, performance optimization, and clean architecture principles.
+[![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat&logo=go)](https://golang.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Go Report Card](https://goreportcard.com/badge/github.com/arash-mosavi/postgrs-unit-of-work-system)](https://goreportcard.com/report/github.com/arash-mosavi/postgrs-unit-of-work-system)
 
-## 🚀 Features
+A comprehensive Unit of Work pattern implementation for Go with PostgreSQL support, designed as an enterprise-ready SDK with type safety, performance optimization, and clean architecture principles following the **service → repository → base repository → unit of work → database** flow.
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+go get github.com/arash-mosavi/postgrs-unit-of-work-system
+```
+
+### Basic Usage
+
+```go
+package main
+
+import (
+    "context"
+    "log"
+
+    "github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/postgres"
+    "github.com/arash-mosavi/postgrs-unit-of-work-system/examples"
+)
+
+func main() {
+    // Configure PostgreSQL connection
+    config := postgres.NewConfig()
+    config.Host = "localhost"
+    config.Port = 5432
+    config.User = "postgres" 
+    config.Password = "password"
+    config.Database = "myapp"
+    config.SSLMode = "disable"
+
+    // Create typed Unit of Work factories
+    userFactory := postgres.NewUnitOfWorkFactory[*examples.User](config)
+    postFactory := postgres.NewUnitOfWorkFactory[*examples.Post](config)
+
+    // Create service with dependency injection
+    userService := examples.NewUserService(userFactory, postFactory)
+
+    // Use the service
+    ctx := context.Background()
+    user := &examples.User{
+        Name:  "John Doe",
+        Email: "john@example.com",
+        Slug:  "john-doe",
+    }
+
+    posts := []*examples.Post{
+        {Name: "First Post", Content: "Hello World", Slug: "first-post"},
+    }
+
+    // Service -> Repository -> Unit of Work -> Database
+    if err := userService.CreateUserWithPosts(ctx, user, posts); err != nil {
+        log.Fatal(err)
+    }
+
+    log.Println("User and posts created successfully!")
+}
+```
+
+## ✨ Features
 
 - **Unit of Work Pattern**: Maintains a list of objects affected by a business transaction and coordinates writing out changes
 - **Repository Pattern**: Encapsulates the logic needed to access data sources
@@ -18,24 +81,32 @@ A comprehensive Unit of Work pattern implementation for Go with PostgreSQL suppo
 ## 📋 Project Structure
 
 ```
-unit-of-work/
+github.com/arash-mosavi/postgrs-unit-of-work-system/
 ├── pkg/
 │   ├── persistence/         # Core interfaces and contracts
-│   ├── postgres/           # PostgreSQL implementation
+│   ├── postgres/           # PostgreSQL implementation  
 │   ├── domain/             # Domain models and base structures
 │   ├── errors/             # Structured error handling
 │   └── identifier/         # Query building utilities
 ├── examples/               # Usage examples and models
+├── cmd/                    # Example applications
 ├── validation.go          # Validation and demonstration program
 ├── go.mod                 # Go module definition
-└── README.md              # This file
+└── README.md              # Documentation
 ```
 
-## 🛠️ Installation
+## 🛠️ Installation & Setup
 
 ### Prerequisites
 
 - Go 1.21 or later
+- PostgreSQL 12+
+
+### Install the SDK
+
+```bash
+go get github.com/arash-mosavi/postgrs-unit-of-work-system
+```
 - PostgreSQL 12+ (for actual database operations)
 
 ### Clone and Setup
@@ -108,25 +179,26 @@ package main
 
 import (
     "context"
-    "unit-of-work/pkg/postgres"
-    "unit-of-work/examples"
+    "github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/postgres"
+    "github.com/arash-mosavi/postgrs-unit-of-work-system/examples"
 )
 
 func main() {
     // Create configuration
-    config := &postgres.Config{
-        Host:     "localhost",
-        Port:     5432,
-        Database: "myapp",
-        Username: "user",
-        Password: "password",
-    }
+    config := postgres.NewConfig()
+    config.Host = "localhost"
+    config.Port = 5432
+    config.Database = "myapp"
+    config.User = "user"
+    config.Password = "password"
+    config.SSLMode = "disable"
 
-    // Create factory
-    factory := postgres.NewUnitOfWorkFactory(config)
+    // Create typed factories
+    userFactory := postgres.NewUnitOfWorkFactory[*examples.User](config)
+    postFactory := postgres.NewUnitOfWorkFactory[*examples.Post](config)
 
     // Create service with dependency injection
-    userService := examples.NewUserService(factory)
+    userService := examples.NewUserService(userFactory, postFactory)
 
     // Use the service
     ctx := context.Background()
@@ -373,7 +445,7 @@ pkg/
 ### 1. Configure Database Connection
 
 ```go
-import "unit-of-work/pkg/postgres"
+import "github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/postgres"
 
 config := postgres.DefaultConfig()
 config.Host = "localhost"
@@ -480,7 +552,7 @@ func CreateUserWithPosts(ctx context.Context, uow persistence.IUnitOfWork, user 
 ### Dynamic Querying with Identifiers
 
 ```go
-import "unit-of-work/pkg/identifier"
+import "github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/identifier"
 
 // Build complex search criteria
 searchID := identifier.NewIdentifier().
@@ -565,7 +637,7 @@ filter := UserFilter{
 The SDK provides structured error handling for better debugging and monitoring:
 
 ```go
-import "unit-of-work/pkg/errors"
+import "github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/errors"
 
 if err := repo.Create(ctx, user); err != nil {
     if errors.IsConstraint(err) {

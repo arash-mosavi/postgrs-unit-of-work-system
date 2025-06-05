@@ -3,9 +3,9 @@ package examples
 import (
 	"context"
 
-	"unit-of-work/pkg/domain"
-	"unit-of-work/pkg/identifier"
-	"unit-of-work/pkg/persistence"
+	"github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/domain"
+	"github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/identifier"
+	"github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/persistence"
 )
 
 // IUserRepository defines user-specific repository operations

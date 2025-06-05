@@ -7,9 +7,9 @@ import (
 	"reflect"
 	"sync"
 
-	"unit-of-work/pkg/domain"
-	"unit-of-work/pkg/identifier"
-	"unit-of-work/pkg/persistence"
+	"github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/domain"
+	"github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/identifier"
+	"github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/persistence"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

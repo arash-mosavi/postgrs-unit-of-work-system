@@ -2,8 +2,8 @@ package persistence
 
 import (
 	"context"
-	"unit-of-work/pkg/domain"
-	"unit-of-work/pkg/identifier"
+	"github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/domain"
+	"github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/identifier"
 )
 
 // IUnitOfWork defines the comprehensive Unit of Work pattern interface with generics

@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"strings"
 
-	"unit-of-work/pkg/domain"
+	"github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/domain"
 
 	"gorm.io/gorm"
 )

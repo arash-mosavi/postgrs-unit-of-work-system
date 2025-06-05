@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	"unit-of-work/pkg/persistence"
-	"unit-of-work/pkg/postgres"
+	"github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/persistence"
+	"github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/postgres"
 )
 
 // UserService demonstrates enterprise-level service implementation following proper architectural flow:

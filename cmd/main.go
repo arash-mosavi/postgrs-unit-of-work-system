@@ -1,7 +1,7 @@
 package main
 
 import (
-	"unit-of-work/examples"
+	"github.com/arash-mosavi/postgrs-unit-of-work-system/examples"
 )
 
 func main() {

@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"unit-of-work/pkg/domain"
-	"unit-of-work/pkg/identifier"
+	"github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/domain"
+	"github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/identifier"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

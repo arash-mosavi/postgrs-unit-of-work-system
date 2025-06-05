@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"unit-of-work/examples"
-	"unit-of-work/pkg/postgres"
+	"github.com/arash-mosavi/postgrs-unit-of-work-system/examples"
+	"github.com/arash-mosavi/postgrs-unit-of-work-system/pkg/postgres"
 )
 
 // This is a simple validation program to demonstrate the Unit of Work SDK usage
