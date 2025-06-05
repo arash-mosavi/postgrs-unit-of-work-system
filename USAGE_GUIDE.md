@@ -48,7 +48,7 @@ go get github.com/arash-mosavi/postgrs-unit-of-work-system
 # Create your main.go (see examples below)
 ```
 
-## 🏃‍♂ Running Examples
+## Running Examples
 
 ### 1. Run Validation Script (No Database Required)
 
@@ -121,7 +121,7 @@ export DB_NAME=testdb
 go run cmd/main.go
 ```
 
-## 💻 SDK Usage in Your Project
+##  SDK Usage in Your Project
 
 ### Basic Setup
 
