@@ -854,7 +854,7 @@ filter := UserFilter{
 }
 ```
 
-## 🚨 Error Handling
+##  Error Handling
 
 The SDK provides structured error handling for better debugging and monitoring:
 
@@ -985,28 +985,3 @@ err := uow.db.AutoMigrate(&User{}, &Post{}, &Tag{})
 
 For production, use proper migration tools like [golang-migrate](https://github.com/golang-migrate/migrate).
 
-##  Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-##  License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-##  Acknowledgments
-
-- Inspired by enterprise patterns from Microsoft and Google
-- Built with [GORM](https://gorm.io/) for database operations
-- Uses [testify](https://github.com/stretchr/testify) for testing
-
-##  Further Reading
-
-- [Unit of Work Pattern](https://martinfowler.com/eaaCatalog/unitOfWork.html)
-- [Repository Pattern](https://martinfowler.com/eaaCatalog/repository.html)
-- [Domain-Driven Design](https://domainlanguage.com/ddd/)
-- [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
-# postgrs-unit-of-work-system
